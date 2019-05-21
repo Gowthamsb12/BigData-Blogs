@@ -1,0 +1,35 @@
+Spark Acid Spupport 
+
+Spark does not support any feature of hive's transnational tables,
+you cannot use spark to delete/update a table and it also has problems reading the aggregated data when no compaction was done.
+Referrence - https://issues.apache.org/jira/browse/SPARK-15348
+
+Yes , after doing compaction it works but this is a problem when your jobs are micro job
+
+Here is an fix for this issue
+------------------------------
+I can able to fix this issue with JDBC call from Spark.May be I can use this JDBC call from spark until we get the native ACID support from Spark.
+
+Step 1
+------
+import org.apache.spark.sql.jdbc.JdbcDialect
+ 
+object HiveDialect extends JdbcDialect {
+  override def canHandle(url : String): Boolean = url.startsWith("jdbc:hive2")
+  override def quoteIdentifier(colName: String): String = {
+    colName.split('.').map(part => s"`$part`").mkString(".")
+  }
+}
+
+Step 2
+-------
+
+// Register the scala object 
+
+JdbcDialect.registerDialect(HiveDialect)
+
+Step 3
+-------
+// Now Create a JDBC with spark DataFrames and run your SQL with Hive ACID tables
+
+val jdbcDF = spark.read.format("jdbc").option("url", "<URL>:10000").option("dbtable", "dbname.tbl_name").option("user", "USER").option("password", "PWD").option("fetchsize","20").load()
