@@ -33,3 +33,9 @@ Step 3
 // Now Create a JDBC with spark DataFrames and run your SQL with Hive ACID tables
 
 val jdbcDF = spark.read.format("jdbc").option("url", "<URL>:10000").option("dbtable", "dbname.tbl_name").option("user", "USER").option("password", "PWD").option("fetchsize","20").load()
+
+
+
+
+
+
