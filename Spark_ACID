@@ -1,8 +1,8 @@
-Spark Acid Spupport 
+Spark Acid Support 
 
 Spark does not support any feature of hive's transnational tables,
 you cannot use spark to delete/update a table and it also has problems reading the aggregated data when no compaction was done.
-Referrence - https://issues.apache.org/jira/browse/SPARK-15348
+Reference  - https://issues.apache.org/jira/browse/SPARK-15348
 
 Yes , after doing compaction it works but this is a problem when your jobs are micro job
 
