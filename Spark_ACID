@@ -26,7 +26,8 @@ Step 2
 
 // Register the scala object 
 
-JdbcDialect.registerDialect(HiveDialect)
+import org.apache.spark.sql.jdbc.JdbcDialect
+JdbcDialects.registerDialect(HiveDialect)
 
 Step 3
 -------
