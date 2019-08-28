@@ -5,11 +5,27 @@ you cannot use spark to delete/update a table and it also has problems reading t
 Reference - https://issues.apache.org/jira/browse/SPARK-15348
 
 Yes, after doing compaction it works but this is a problem when your jobs are micro job
+Fix -1 (Hive LLAP)
+------------------
+Live Long and Process, LLAP provides a hybrid execution model
+LLAP is aware of transactions. The merging of delta files to produce a certain state of the tables is performed before the data is placed in the cache.
+Multiple versions are possible and the request specifies which version is to be used. This has the benefit of doing the merge asynchronously and only once for cached data, thus avoiding the hit on the operator pipeline.
 
-Here is a fix for this issue
-------------------------------
+Code 
+----
+import com.hortonworks.hwc.HiveWarehouseSession
+val hive = HiveWarehouseSession.session(spark).build()
+val a = hive.executeQuery("select a.* from cs.acct_dim a limit 10")
+a.show
+
+Note: Here table " cs.acct_dim " in the above query is ACID table , now we can use it as normal DF and LLAP need to be get installed in your cluster.
+
+Fix -2 (Hive JDBC)
+------------------
 I can able to fix this issue with JDBC call from Spark. Maybe I can use this JDBC call from spark until we get the native ACID support from Spark.
 
+Code
+-----
 Step 1
 ------
 import org.apache.spark.sql.jdbc.JdbcDialect
@@ -34,6 +50,8 @@ Step 3
 
 val jdbcDF = spark.read.format("jdbc").option("url", "<URL>:10000").option("dbtable", "dbname.tbl_name").option("user", "USER").option("password", "PWD").option("fetchsize","20").load()
 
+
+Note: JDBC approach required performance tunning unlike DF
 
 
 
